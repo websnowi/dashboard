@@ -6,7 +6,8 @@ import {
   Home, 
   LogOut, 
   Menu, 
-  X 
+  X, 
+  Megaphone 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,7 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  currentPage: 'home' | 'analytics';
+  currentPage: 'home' | 'analytics' | 'ads';
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
@@ -28,6 +29,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const navItems = [
     { name: 'Home', icon: Home, path: '/' },
     { name: 'Analytics', icon: BarChart2, path: '/analytics' },
+    { name: 'Ads', icon: Megaphone, path: '/ads' },
   ];
 
   const handleSignOut = () => {

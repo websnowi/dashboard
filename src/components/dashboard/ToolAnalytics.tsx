@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -34,6 +34,7 @@ const ToolAnalytics: React.FC = () => {
     approvedTools.length > 0 ? approvedTools[0].id : null
   );
   const [timeRange, setTimeRange] = useState<TimeRange>('day');
+  const [chartData, setChartData] = useState<Array<{date: string, users: number}>>([]);
 
   const selectedTool = approvedTools.find(tool => tool.id === selectedToolId);
   
@@ -47,16 +48,47 @@ const ToolAnalytics: React.FC = () => {
     );
   };
 
-  // Prepare chart data
-  const prepareChartData = () => {
-    if (!selectedTool?.usageStats) return [];
+  // Prepare chart data based on the selected time range
+  useEffect(() => {
+    if (!selectedTool?.usageStats) {
+      setChartData([]);
+      return;
+    }
     
-    // For demonstration, we'll just use existing data
-    // In a real app, you would filter by the selected time range
-    return Object.entries(selectedTool.usageStats).map(([date, count]) => ({
+    const now = new Date();
+    const filteredData: {[date: string]: number} = {};
+    
+    // Filter data based on time range
+    Object.entries(selectedTool.usageStats).forEach(([dateStr, count]) => {
+      const entryDate = new Date(dateStr);
+      
+      if (timeRange === 'day' || 
+          (timeRange === 'week' && isWithinLastWeek(entryDate, now)) ||
+          (timeRange === 'month' && isWithinLastMonth(entryDate, now))) {
+        filteredData[dateStr] = count;
+      }
+    });
+    
+    // Convert to chart format
+    const formattedData = Object.entries(filteredData).map(([date, count]) => ({
       date: new Date(date).toLocaleDateString(),
       users: count,
     }));
+    
+    setChartData(formattedData);
+  }, [selectedTool, timeRange]);
+  
+  // Helper functions for date filtering
+  const isWithinLastWeek = (date: Date, now: Date) => {
+    const weekAgo = new Date(now);
+    weekAgo.setDate(now.getDate() - 7);
+    return date >= weekAgo;
+  };
+  
+  const isWithinLastMonth = (date: Date, now: Date) => {
+    const monthAgo = new Date(now);
+    monthAgo.setMonth(now.getMonth() - 1);
+    return date >= monthAgo;
   };
 
   return (
@@ -150,7 +182,7 @@ const ToolAnalytics: React.FC = () => {
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={prepareChartData()}
+                    data={chartData}
                     margin={{
                       top: 5,
                       right: 30,

@@ -4,23 +4,18 @@ import { useToolContext } from '@/context/ToolContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Check, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ToolsList: React.FC = () => {
   const { 
     getPendingTools, 
-    getApprovedTools, 
-    approveTool, 
+    getApprovedTools,
     deleteTool 
   } = useToolContext();
   
   const pendingTools = getPendingTools();
   const approvedTools = getApprovedTools();
-
-  const handleApproveTool = (id: string) => {
-    approveTool(id);
-  };
 
   const handleDeleteTool = (id: string) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this tool?');
@@ -66,14 +61,6 @@ const ToolsList: React.FC = () => {
         
         {status === 'pending' && (
           <div className="flex space-x-2 mt-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="flex-1 border-green-500 text-green-500 hover:bg-green-50"
-              onClick={() => handleApproveTool(id)}
-            >
-              <Check className="h-4 w-4 mr-1" /> Approve
-            </Button>
             <Button 
               size="sm" 
               variant="outline"
