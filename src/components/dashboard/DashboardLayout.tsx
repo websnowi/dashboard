@@ -69,7 +69,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       >
         {/* Logo area */}
         <div className="px-6 py-8">
-          <h1 className="text-2xl font-bold text-white">User Name</h1>
+          <h1 className="text-2xl font-bold text-white">{userName}</h1>
           <p className="text-sm text-white/70 mt-1">
             {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan
           </p>
