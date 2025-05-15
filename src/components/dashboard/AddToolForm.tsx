@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToolContext } from '@/context/ToolContext';
 import { Button } from '@/components/ui/button';
@@ -25,49 +24,56 @@ const AddToolForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     if (!file.type.startsWith('image/')) {
       toast.error('Please upload an image file');
       return;
     }
-    
-    // In a real app, you would upload the image to a server/storage
-    // For now, we'll create a local URL preview
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setImagePreview(reader.result);
-        // In a mock scenario, we'll just use this as our imageUrl
-        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+
+    const form = new FormData();
+    form.append('image', file);
+
+    try {
+      const res = await fetch('http://localhost:3001/upload', {
+        method: 'POST',
+        body: form,
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        setImagePreview(data.url);
+        setFormData(prev => ({ ...prev, imageUrl: data.url }));
+      } else {
+        toast.error('Failed to upload image');
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      toast.error('Error uploading image');
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // Validation
       if (!formData.name || !formData.description || !formData.link) {
         toast.error('Please fill in all required fields');
         return;
       }
-      
-      // If no image was uploaded, use a placeholder
-      const finalImageUrl = formData.imageUrl || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&auto=format&fit=crop&q=60';
-      
-      // Add the tool
+
+      const finalImageUrl =
+        formData.imageUrl ||
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&auto=format&fit=crop&q=60';
+
       addTool({
         ...formData,
-        imageUrl: finalImageUrl
+        imageUrl: finalImageUrl,
       });
-      
-      // Clear the form
+
       setFormData({
         name: '',
         description: '',
@@ -75,7 +81,6 @@ const AddToolForm: React.FC = () => {
         imageUrl: '',
       });
       setImagePreview(null);
-      
     } catch (error) {
       console.error('Error submitting tool:', error);
       toast.error('Something went wrong while submitting the tool');
@@ -104,7 +109,7 @@ const AddToolForm: React.FC = () => {
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="description" className="block text-sm font-medium">
               Tool Description *
@@ -119,7 +124,7 @@ const AddToolForm: React.FC = () => {
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="link" className="block text-sm font-medium">
               Tool Link *
@@ -134,38 +139,34 @@ const AddToolForm: React.FC = () => {
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="image" className="block text-sm font-medium">
               Tool Image
             </label>
-            <div className="flex items-center space-x-4">
-              <Input
-                id="image"
-                name="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full"
-              />
-            </div>
-            
+            <Input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
             {imagePreview && (
               <div className="mt-4">
                 <p className="text-sm font-medium mb-2">Preview:</p>
                 <div className="relative w-40 h-40 overflow-hidden rounded-md">
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
             )}
           </div>
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             disabled={isSubmitting}
             className="w-full bg-dashboard-primary hover:bg-dashboard-primary/90 text-white"
           >
