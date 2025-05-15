@@ -7,15 +7,18 @@ import {
   LogOut, 
   Menu, 
   X, 
-  Megaphone 
+  Megaphone,
+  Settings,
+  Support
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUserContext } from '@/context/UserContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  currentPage: 'home' | 'analytics' | 'ads';
+  currentPage: 'home' | 'analytics' | 'ads' | 'support' | 'settings';
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
@@ -25,11 +28,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { userName, userPlan } = useUserContext();
 
   const navItems = [
     { name: 'Home', icon: Home, path: '/' },
     { name: 'Analytics', icon: BarChart2, path: '/analytics' },
     { name: 'Ads', icon: Megaphone, path: '/ads' },
+    { name: 'Support', icon: Support, path: '/support' }
   ];
 
   const handleSignOut = () => {
@@ -64,7 +69,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       >
         {/* Logo area */}
         <div className="px-6 py-8">
-          <h1 className="text-2xl font-bold text-white">AI Tools Admin</h1>
+          <h1 className="text-2xl font-bold text-white">User Name</h1>
+          <p className="text-sm text-white/70 mt-1">
+            {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan
+          </p>
         </div>
 
         {/* Navigation links */}
@@ -91,8 +99,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </nav>
         </div>
 
-        {/* Sign out button */}
+        {/* Settings and Sign out buttons */}
         <div className="px-4 py-6 border-t border-sidebar-border">
+          <Button
+            variant="ghost"
+            className="w-full justify-start px-4 py-6 text-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground mb-2"
+            onClick={() => {
+              navigate('/settings');
+              if (isMobile) setSidebarOpen(false);
+            }}
+          >
+            <Settings className="mr-4 h-5 w-5" />
+            Settings
+          </Button>
           <Button
             variant="ghost"
             className="w-full justify-start px-4 py-6 text-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

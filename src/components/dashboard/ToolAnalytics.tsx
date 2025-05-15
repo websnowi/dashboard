@@ -24,19 +24,42 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
+import { useUserContext } from '@/context/UserContext';
 
 type TimeRange = 'day' | 'week' | 'month';
 
 const ToolAnalytics: React.FC = () => {
   const { getApprovedTools } = useToolContext();
+  const { userPlan } = useUserContext();
   const approvedTools = getApprovedTools();
   const [selectedToolId, setSelectedToolId] = useState<string | null>(
     approvedTools.length > 0 ? approvedTools[0].id : null
   );
-  const [timeRange, setTimeRange] = useState<TimeRange>('day');
+  const [timeRange, setTimeRange] = useState<TimeRange>('month');
   const [chartData, setChartData] = useState<Array<{date: string, users: number}>>([]);
 
   const selectedTool = approvedTools.find(tool => tool.id === selectedToolId);
+  
+  // Determine available time ranges based on the user plan
+  const availableTimeRanges = React.useMemo(() => {
+    switch (userPlan) {
+      case 'starter':
+        return ['month'];
+      case 'professional':
+        return ['week', 'month'];
+      case 'enterprise':
+        return ['day', 'week', 'month'];
+      default:
+        return ['month'];
+    }
+  }, [userPlan]);
+
+  // Set default time range based on the user plan
+  useEffect(() => {
+    if (!availableTimeRanges.includes(timeRange)) {
+      setTimeRange('month');
+    }
+  }, [availableTimeRanges, timeRange]);
   
   // Calculate total users
   const calculateTotalUsers = () => {
@@ -46,6 +69,21 @@ const ToolAnalytics: React.FC = () => {
       (total, userCount) => total + userCount, 
       0
     );
+  };
+
+  // Format date based on selected time range
+  const formatChartDate = (dateStr: string, range: TimeRange) => {
+    const date = new Date(dateStr);
+    switch (range) {
+      case 'day':
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      case 'week':
+        return date.toLocaleDateString([], { weekday: 'short', day: 'numeric' });
+      case 'month':
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      default:
+        return date.toLocaleDateString();
+    }
   };
 
   // Prepare chart data based on the selected time range
@@ -69,9 +107,9 @@ const ToolAnalytics: React.FC = () => {
       }
     });
     
-    // Convert to chart format
+    // Convert to chart format with formatted dates
     const formattedData = Object.entries(filteredData).map(([date, count]) => ({
-      date: new Date(date).toLocaleDateString(),
+      date: formatChartDate(date, timeRange),
       users: count,
     }));
     
@@ -117,14 +155,21 @@ const ToolAnalytics: React.FC = () => {
               <Select
                 value={timeRange}
                 onValueChange={(value) => setTimeRange(value as TimeRange)}
+                disabled={availableTimeRanges.length <= 1}
               >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Time range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Day</SelectItem>
-                  <SelectItem value="week">Week</SelectItem>
-                  <SelectItem value="month">Month</SelectItem>
+                  {(availableTimeRanges.includes('day')) && (
+                    <SelectItem value="day">Day</SelectItem>
+                  )}
+                  {(availableTimeRanges.includes('week')) && (
+                    <SelectItem value="week">Week</SelectItem>
+                  )}
+                  {(availableTimeRanges.includes('month')) && (
+                    <SelectItem value="month">Month</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
