@@ -9,7 +9,7 @@ import {
   X, 
   Megaphone,
   Settings,
-  Support
+  HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { name: 'Home', icon: Home, path: '/' },
     { name: 'Analytics', icon: BarChart2, path: '/analytics' },
     { name: 'Ads', icon: Megaphone, path: '/ads' },
-    { name: 'Support', icon: Support, path: '/support' }
+    { name: 'Support', icon: HelpCircle, path: '/support' }
   ];
 
   const handleSignOut = () => {
