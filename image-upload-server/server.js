@@ -11,7 +11,7 @@ const upload = multer({ dest: 'uploads/' });
 app.use(cors());
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const REPO = 'your-username/your-repo'; // Replace with your actual repo
+const REPO = 'websnowi/dashboard'; // Replace with your actual repo
 const BRANCH = 'main';
 
 app.post('/upload', upload.single('image'), async (req, res) => {
