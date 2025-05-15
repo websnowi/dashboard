@@ -1,13 +1,31 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React from 'react';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import AddToolForm from '@/components/dashboard/AddToolForm';
+import ToolsList from '@/components/dashboard/ToolsList';
+import { ToolProvider } from '@/context/ToolContext';
+
+const Index: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <ToolProvider>
+      <DashboardLayout currentPage="home">
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+            <p className="text-gray-600">
+              Welcome to the AI Tools Dashboard. Add and manage tools for your website.
+            </p>
+          </div>
+          
+          <AddToolForm />
+          
+          <div className="pb-10">
+            <h2 className="text-2xl font-semibold mb-6">Manage Tools</h2>
+            <ToolsList />
+          </div>
+        </div>
+      </DashboardLayout>
+    </ToolProvider>
   );
 };
 
