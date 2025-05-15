@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useToolContext } from '@/context/ToolContext';
+import { ToolProvider } from '@/context/ToolContext';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { 
   Card, 
@@ -27,7 +28,7 @@ interface AdBid {
   position?: number; // Used for homepage positions
 }
 
-const Ads: React.FC = () => {
+const AdsContent: React.FC = () => {
   const { getApprovedTools } = useToolContext();
   const approvedTools = getApprovedTools();
   
@@ -37,7 +38,7 @@ const Ads: React.FC = () => {
   const [homepagePositionBids, setHomepagePositionBids] = useState<AdBid[]>([]);
   
   // State for bid amounts
-  const [bidAmounts, setBidAmounts] = useState<{[key: string]: number}>({
+  const [bidAmounts, setBidAmounts] = useState<{[key: string]: number | number[]}>({
     headerBanner: headerBannerBid?.amount ? headerBannerBid.amount + 1 : 10,
     popup: popupBid?.amount ? popupBid.amount + 1 : 5,
     positions: Array(6).fill(0).map((_, i) => {
@@ -58,9 +59,10 @@ const Ads: React.FC = () => {
     }
     
     const getBidAmount = () => {
-      if (type === 'headerBanner') return bidAmounts.headerBanner;
-      if (type === 'popup') return bidAmounts.popup;
-      if (type === 'position' && position !== undefined) return bidAmounts.positions[position];
+      if (type === 'headerBanner') return bidAmounts.headerBanner as number;
+      if (type === 'popup') return bidAmounts.popup as number;
+      if (type === 'position' && position !== undefined) 
+        return (bidAmounts.positions as number[])[position];
       return 0;
     };
     
@@ -106,14 +108,13 @@ const Ads: React.FC = () => {
         return newBids;
       });
       
-      setBidAmounts(prev => {
-        const newPositions = [...prev.positions];
-        newPositions[position] = bidAmount + 1;
-        return {
-          ...prev,
-          positions: newPositions
-        };
-      });
+      const newPositions = [...(bidAmounts.positions as number[])];
+      newPositions[position] = bidAmount + 1;
+      
+      setBidAmounts(prev => ({
+        ...prev,
+        positions: newPositions
+      }));
       toast.success(`Homepage position ${position + 1} bid placed successfully!`);
     }
   };
@@ -151,215 +152,224 @@ const Ads: React.FC = () => {
   };
 
   return (
-    <DashboardLayout currentPage="ads">
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Advertising Options</h1>
-          <p className="text-gray-600">
-            Promote your AI tools on our website with various advertising options.
-          </p>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Select Your Tool 
-            </CardTitle>
-            <CardDescription>
-              Choose which of your approved tools you want to advertise
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {approvedTools.map(tool => (
-                <Button
-                  key={tool.id}
-                  variant={selectedToolId === tool.id ? "default" : "outline"}
-                  className="h-auto py-2 px-3 justify-start"
-                  onClick={() => setSelectedToolId(tool.id)}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <div className="w-8 h-8 overflow-hidden rounded-sm flex-shrink-0">
-                      <img src={tool.imageUrl} alt={tool.name} className="w-full h-full object-cover" />
-                    </div>
-                    <span className="truncate">{tool.name}</span>
-                  </div>
-                </Button>
-              ))}
-            </div>
-            
-            {approvedTools.length === 0 && (
-              <p className="text-center py-4 text-gray-500">
-                You don't have any approved tools yet. Get your tools approved first.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Tabs defaultValue="premium" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="premium">Premium Positions</TabsTrigger>
-            <TabsTrigger value="homepage">Homepage Positions</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="premium" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  Header Banner 
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>Your tool will appear as a prominent banner at the top of our main website, receiving maximum visibility.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {getCurrentBidDisplay('headerBanner')}
-                
-                <div className="flex gap-3">
-                  <Input
-                    type="number"
-                    min={headerBannerBid ? headerBannerBid.amount + 1 : 1}
-                    value={bidAmounts.headerBanner}
-                    onChange={(e) => setBidAmounts(prev => ({ 
-                      ...prev, 
-                      headerBanner: Number(e.target.value) 
-                    }))}
-                    placeholder="Bid amount in $"
-                    className="w-32"
-                    disabled={!selectedToolId}
-                  />
-                  <Button 
-                    onClick={() => handlePlaceBid('headerBanner')}
-                    disabled={!selectedToolId}
-                  >
-                    Place Bid
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  Popup Ad 
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>Your tool will appear in a popup when users visit our website, ensuring they see your tool first.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {getCurrentBidDisplay('popup')}
-                
-                <div className="flex gap-3">
-                  <Input
-                    type="number"
-                    min={popupBid ? popupBid.amount + 1 : 1}
-                    value={bidAmounts.popup}
-                    onChange={(e) => setBidAmounts(prev => ({ 
-                      ...prev, 
-                      popup: Number(e.target.value) 
-                    }))}
-                    placeholder="Bid amount in $"
-                    className="w-32"
-                    disabled={!selectedToolId}
-                  />
-                  <Button 
-                    onClick={() => handlePlaceBid('popup')}
-                    disabled={!selectedToolId}
-                  >
-                    Place Bid
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="homepage">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  Homepage Tool Positions
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>Your tool will be featured in one of the top positions on our homepage. Position 1 is the most prominent.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardTitle>
-                <CardDescription>
-                  Bid to secure a top position for your tool on our homepage
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {Array(6).fill(0).map((_, i) => (
-                    <Card key={i} className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">
-                          Position {i + 1}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {getCurrentBidDisplay('position', i)}
-                        
-                        <div className="flex gap-2 flex-wrap">
-                          <Input
-                            type="number"
-                            min={1}
-                            value={bidAmounts.positions[i]}
-                            onChange={(e) => {
-                              const newPositions = [...bidAmounts.positions];
-                              newPositions[i] = Number(e.target.value);
-                              setBidAmounts(prev => ({
-                                ...prev,
-                                positions: newPositions
-                              }));
-                            }}
-                            placeholder="Bid amount in $"
-                            className="w-24"
-                            disabled={!selectedToolId}
-                          />
-                          <Button 
-                            onClick={() => handlePlaceBid('position', i)}
-                            disabled={!selectedToolId}
-                          >
-                            Place Bid
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Advertising Options</h1>
+        <p className="text-gray-600">
+          Promote your AI tools on our website with various advertising options.
+        </p>
       </div>
-    </DashboardLayout>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Select Your Tool 
+          </CardTitle>
+          <CardDescription>
+            Choose which of your approved tools you want to advertise
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {approvedTools.map(tool => (
+              <Button
+                key={tool.id}
+                variant={selectedToolId === tool.id ? "default" : "outline"}
+                className="h-auto py-2 px-3 justify-start"
+                onClick={() => setSelectedToolId(tool.id)}
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <div className="w-8 h-8 overflow-hidden rounded-sm flex-shrink-0">
+                    <img src={tool.imageUrl} alt={tool.name} className="w-full h-full object-cover" />
+                  </div>
+                  <span className="truncate">{tool.name}</span>
+                </div>
+              </Button>
+            ))}
+          </div>
+          
+          {approvedTools.length === 0 && (
+            <p className="text-center py-4 text-gray-500">
+              You don't have any approved tools yet. Get your tools approved first.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Tabs defaultValue="premium" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="premium">Premium Positions</TabsTrigger>
+          <TabsTrigger value="homepage">Homepage Positions</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="premium" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Header Banner 
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Your tool will appear as a prominent banner at the top of our main website, receiving maximum visibility.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {getCurrentBidDisplay('headerBanner')}
+              
+              <div className="flex gap-3">
+                <Input
+                  type="number"
+                  min={headerBannerBid ? headerBannerBid.amount + 1 : 1}
+                  value={bidAmounts.headerBanner as number}
+                  onChange={(e) => setBidAmounts(prev => ({ 
+                    ...prev, 
+                    headerBanner: Number(e.target.value) 
+                  }))}
+                  placeholder="Bid amount in $"
+                  className="w-32"
+                  disabled={!selectedToolId}
+                />
+                <Button 
+                  onClick={() => handlePlaceBid('headerBanner')}
+                  disabled={!selectedToolId}
+                >
+                  Place Bid
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Popup Ad 
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Your tool will appear in a popup when users visit our website, ensuring they see your tool first.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {getCurrentBidDisplay('popup')}
+              
+              <div className="flex gap-3">
+                <Input
+                  type="number"
+                  min={popupBid ? popupBid.amount + 1 : 1}
+                  value={bidAmounts.popup as number}
+                  onChange={(e) => setBidAmounts(prev => ({ 
+                    ...prev, 
+                    popup: Number(e.target.value) 
+                  }))}
+                  placeholder="Bid amount in $"
+                  className="w-32"
+                  disabled={!selectedToolId}
+                />
+                <Button 
+                  onClick={() => handlePlaceBid('popup')}
+                  disabled={!selectedToolId}
+                >
+                  Place Bid
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="homepage">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Homepage Tool Positions
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Your tool will be featured in one of the top positions on our homepage. Position 1 is the most prominent.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
+              <CardDescription>
+                Bid to secure a top position for your tool on our homepage
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array(6).fill(0).map((_, i) => (
+                  <Card key={i} className="shadow-md">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">
+                        Position {i + 1}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {getCurrentBidDisplay('position', i)}
+                      
+                      <div className="flex gap-2 flex-wrap">
+                        <Input
+                          type="number"
+                          min={1}
+                          value={(bidAmounts.positions as number[])[i]}
+                          onChange={(e) => {
+                            const newPositions = [...(bidAmounts.positions as number[])];
+                            newPositions[i] = Number(e.target.value);
+                            setBidAmounts(prev => ({
+                              ...prev,
+                              positions: newPositions
+                            }));
+                          }}
+                          placeholder="Bid amount in $"
+                          className="w-24"
+                          disabled={!selectedToolId}
+                        />
+                        <Button 
+                          onClick={() => handlePlaceBid('position', i)}
+                          disabled={!selectedToolId}
+                        >
+                          Place Bid
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+// Main Ads component wrapped with ToolProvider
+const Ads: React.FC = () => {
+  return (
+    <ToolProvider>
+      <DashboardLayout currentPage="ads">
+        <AdsContent />
+      </DashboardLayout>
+    </ToolProvider>
   );
 };
 
