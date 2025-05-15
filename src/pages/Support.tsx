@@ -125,7 +125,7 @@ const SupportContent: React.FC = () => {
                   <div className="space-y-2">
                     <h3 className="font-bold">How do I upgrade my plan?</h3>
                     <p className="text-muted-foreground">
-                      Go to Settings > Plan and select the plan you wish to upgrade to.
+                      Go to Settings {'>'} Plan and select the plan you wish to upgrade to.
                     </p>
                   </div>
                   
