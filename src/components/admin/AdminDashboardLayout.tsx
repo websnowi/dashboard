@@ -1,10 +1,22 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Database, Users, LayoutDashboard } from 'lucide-react';
+import { Shield, Database, Users, LayoutDashboard, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-export const AdminDashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AdminDashboardLayoutProps {
+  children: React.ReactNode;
+  onSignOut?: () => void;
+}
+
+export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ 
+  children, 
+  onSignOut 
+}) => {
+  // In a real app, this would come from a context or API
+  const adminName = "Super Admin";
+  
   return (
     <div className="min-h-screen flex">
       {/* Admin Sidebar */}
@@ -40,6 +52,25 @@ export const AdminDashboardLayout: React.FC<{ children: React.ReactNode }> = ({ 
         </div>
         
         <div className="p-4 border-t border-slate-700">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center">
+              <Avatar className="h-8 w-8 mr-2">
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {adminName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium">{adminName}</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-slate-400 hover:text-white hover:bg-slate-800"
+              onClick={onSignOut}
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <Link to="/">
             <Button variant="outline" className="w-full bg-slate-800 hover:bg-slate-700 text-white border-slate-700">
               <LayoutDashboard className="mr-2 h-4 w-4" />

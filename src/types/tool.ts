@@ -9,6 +9,7 @@ export interface AITool {
   imageUrl: string;
   status: ToolStatus;
   createdAt: Date;
+  category?: string;
   usageStats?: Record<string, number>;
 }
 

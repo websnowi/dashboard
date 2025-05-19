@@ -9,6 +9,7 @@ interface ToolContextType {
   approveTool: (id: string) => void;
   rejectTool: (id: string) => void;
   deleteTool: (id: string) => void;
+  updateTool: (id: string, toolData: Partial<AITool>) => void;
   getToolById: (id: string) => AITool | undefined;
   getPendingTools: () => AITool[];
   getApprovedTools: () => AITool[];
@@ -28,6 +29,7 @@ const mockTools: AITool[] = [
     link: 'https://chat.openai.com',
     imageUrl: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&auto=format&fit=crop&q=60',
     status: 'approved',
+    category: 'productivity',
     createdAt: new Date('2023-01-10'),
     usageStats: {
       '2024-05-10': 120,
@@ -45,6 +47,7 @@ const mockTools: AITool[] = [
     link: 'https://openai.com/dall-e',
     imageUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&auto=format&fit=crop&q=60',
     status: 'approved',
+    category: 'creativity',
     createdAt: new Date('2023-02-15'),
     usageStats: {
       '2024-05-10': 80,
@@ -62,6 +65,7 @@ const mockTools: AITool[] = [
     link: 'https://www.midjourney.com',
     imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=60',
     status: 'pending',
+    category: 'creativity',
     createdAt: new Date('2023-03-20')
   },
 ];
@@ -112,6 +116,15 @@ export const ToolProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success('Tool rejected successfully');
   };
 
+  const updateTool = (id: string, toolData: Partial<AITool>) => {
+    setTools(prevTools =>
+      prevTools.map(tool =>
+        tool.id === id ? { ...tool, ...toolData } : tool
+      )
+    );
+    toast.success('Tool updated successfully');
+  };
+
   const deleteTool = (id: string) => {
     setTools(prevTools => prevTools.filter(tool => tool.id !== id));
     toast.success('Tool deleted successfully');
@@ -149,6 +162,7 @@ export const ToolProvider: React.FC<{ children: React.ReactNode }> = ({ children
       approveTool,
       rejectTool,
       deleteTool,
+      updateTool,
       getToolById,
       getPendingTools,
       getApprovedTools,
