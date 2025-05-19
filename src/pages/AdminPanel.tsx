@@ -11,21 +11,18 @@ import {
   X, 
   Trash2 
 } from 'lucide-react';
-import { 
-  Button,
-  Card,
-  Badge,
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger,
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui';
+} from '@/components/ui/table';
 
 const AdminPanel: React.FC = () => {
   const { 
