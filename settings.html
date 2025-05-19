@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | websnowi</title>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background-color: #f9fafb;
+      color: #111827;
+    }
+    
+    /* Layout Styles */
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background-color: #1e293b;
+      color: #fff;
+      position: fixed;
+      height: 100vh;
+      padding: 20px 0;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding: 0 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-header h1 {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .sidebar-header p {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+    
+    .sidebar-nav {
+      padding: 24px 0;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      font-size: 16px;
+      color: #fff;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    
+    .nav-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .nav-item i {
+      margin-right: 12px;
+    }
+    
+    .sidebar-footer {
+      padding: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 40px;
+    }
+    
+    .settings-header {
+      margin-bottom: 32px;
+    }
+    
+    .settings-header h1 {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .settings-header p {
+      color: #6b7280;
+    }
+    
+    /* Tabs */
+    .tabs {
+      margin-bottom: 30px;
+    }
+    
+    .tab-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    
+    .tab-trigger {
+      padding: 10px;
+      background-color: #f3f4f6;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .tab-trigger.active {
+      background-color: #3b82f6;
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Cards */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+    }
+    
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .card-description {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .card-content {
+      padding: 24px;
+    }
+    
+    .card-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    button {
+      padding: 10px 16px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: #2563eb;
+    }
+    
+    button.outline {
+      background-color: transparent;
+      border: 1px solid #3b82f6;
+      color: #3b82f6;
+    }
+    
+    button.outline:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+    
+    button.destructive {
+      background-color: #ef4444;
+    }
+    
+    button.destructive:hover {
+      background-color: #dc2626;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Plan Cards */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    .plan-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      transition: border-color 0.2s;
+    }
+    
+    .plan-card.active {
+      border-color: #3b82f6;
+    }
+    
+    .plan-price {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .plan-features {
+      list-style: none;
+      margin: 16px 0;
+    }
+    
+    .plan-features li {
+      padding: 4px 0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 100;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+      
+      .mobile-menu-trigger {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        z-index: 101;
+      }
+      
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile menu toggle button -->
+  <div class="mobile-menu-trigger" id="mobileMenuTrigger">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </div>
+  
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1 id="username">User</h1>
+        <p id="userPlan">Starter Plan</p>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></i>
+          Home
+        </a>
+        <a href="analytics.html" class="nav-item">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg></i>
+          Analytics
+        </a>
+        <a href="ads.html" class="nav-item">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg></i>
+          Ads
+        </a>
+        <a href="support.html" class="nav-item">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></i>
+          Support
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item active">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg></i>
+          Settings
+        </a>
+        <a href="#" class="nav-item" id="signOutBtn">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></i>
+          Sign Out
+        </a>
+      </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+      <div class="settings-header">
+        <h1>Settings</h1>
+        <p>Manage your account settings and preferences</p>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab-list" id="settingsTabs">
+          <button class="tab-trigger active" data-tab="profile">Profile</button>
+          <button class="tab-trigger" data-tab="plan">Plan</button>
+          <button class="tab-trigger" data-tab="account">Account</button>
+        </div>
+        
+        <!-- Profile Tab -->
+        <div id="profileTab" class="tab-content active">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Profile Settings</h2>
+              <p class="card-description">Update your personal information</p>
+            </div>
+            <div class="card-content">
+              <form id="profileForm">
+                <div class="form-group">
+                  <label for="username">Username</label>
+                  <input type="text" id="usernameInput" name="username">
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="emailInput" name="email" value="user@example.com">
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button id="saveProfileBtn">Save Changes</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Plan Tab -->
+        <div id="planTab" class="tab-content">
+          <div class="plans-grid">
+            <!-- Starter Plan -->
+            <div class="card plan-card" id="starterPlan">
+              <div class="card-header">
+                <h2 class="card-title">Starter</h2>
+                <p class="plan-price">$29/month</p>
+              </div>
+              <div class="card-content">
+                <ul class="plan-features">
+                  <li>Monthly analytics</li>
+                  <li>Basic features</li>
+                </ul>
+              </div>
+              <div class="card-footer">
+                <button id="starterPlanBtn" class="plan-select-btn">Select Plan</button>
+              </div>
+            </div>
+            
+            <!-- Professional Plan -->
+            <div class="card plan-card" id="professionalPlan">
+              <div class="card-header">
+                <h2 class="card-title">Professional</h2>
+                <p class="plan-price">$59/month</p>
+              </div>
+              <div class="card-content">
+                <ul class="plan-features">
+                  <li>Monthly & weekly analytics</li>
+                  <li>Advanced features</li>
+                </ul>
+              </div>
+              <div class="card-footer">
+                <button id="professionalPlanBtn" class="plan-select-btn">Select Plan</button>
+              </div>
+            </div>
+            
+            <!-- Enterprise Plan -->
+            <div class="card plan-card" id="enterprisePlan">
+              <div class="card-header">
+                <h2 class="card-title">Enterprise</h2>
+                <p class="plan-price">$99/month</p>
+              </div>
+              <div class="card-content">
+                <ul class="plan-features">
+                  <li>Daily, weekly & monthly analytics</li>
+                  <li>Premium support</li>
+                </ul>
+              </div>
+              <div class="card-footer">
+                <button id="enterprisePlanBtn" class="plan-select-btn">Select Plan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Account Tab -->
+        <div id="accountTab" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Account Security</h2>
+              <p class="card-description">Update your password or delete your account</p>
+            </div>
+            <div class="card-content">
+              <form id="passwordForm">
+                <div class="form-group">
+                  <label for="password">New Password</label>
+                  <input type="password" id="passwordInput" name="password">
+                </div>
+                <div class="form-group">
+                  <label for="confirmPassword">Confirm Password</label>
+                  <input type="password" id="confirmPasswordInput" name="confirmPassword">
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button id="updatePasswordBtn" disabled>Update Password</button>
+              <button id="deleteAccountBtn" class="destructive">Delete Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast notifications container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    // Load user data from localStorage or use defaults
+    const userData = JSON.parse(localStorage.getItem('userData')) || {
+      username: 'User',
+      email: 'user@example.com',
+      plan: 'starter'
+    };
+    
+    // DOM Elements
+    const sidebar = document.getElementById('sidebar');
+    const mobileMenuTrigger = document.getElementById('mobileMenuTrigger');
+    const usernameElement = document.getElementById('username');
+    const userPlanElement = document.getElementById('userPlan');
+    const settingsTabs = document.getElementById('settingsTabs');
+    const tabButtons = document.querySelectorAll('.tab-trigger');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Form elements
+    const usernameInput = document.getElementById('usernameInput');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const updatePasswordBtn = document.getElementById('updatePasswordBtn');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    
+    // Plan buttons
+    const starterPlanBtn = document.getElementById('starterPlanBtn');
+    const professionalPlanBtn = document.getElementById('professionalPlanBtn');
+    const enterprisePlanBtn = document.getElementById('enterprisePlanBtn');
+    const planCards = document.querySelectorAll('.plan-card');
+    
+    // Initialize the page
+    function init() {
+      // Set user data in the UI
+      usernameElement.textContent = userData.username;
+      userPlanElement.textContent = capitalizeFirstLetter(userData.plan) + ' Plan';
+      usernameInput.value = userData.username;
+      emailInput.value = userData.email;
+      
+      // Set active plan
+      updateActivePlan(userData.plan);
+      
+      // Set up event listeners
+      setupEventListeners();
+    }
+    
+    // Set up all event listeners
+    function setupEventListeners() {
+      // Mobile menu toggle
+      mobileMenuTrigger.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+      
+      // Tab switching
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const tabId = button.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+      
+      // Form submissions
+      saveProfileBtn.addEventListener('click', saveProfile);
+      updatePasswordBtn.addEventListener('click', updatePassword);
+      deleteAccountBtn.addEventListener('click', deleteAccount);
+      signOutBtn.addEventListener('click', signOut);
+      
+      // Plan selection
+      starterPlanBtn.addEventListener('click', () => changePlan('starter'));
+      professionalPlanBtn.addEventListener('click', () => changePlan('professional'));
+      enterprisePlanBtn.addEventListener('click', () => changePlan('enterprise'));
+      
+      // Password validation
+      passwordInput.addEventListener('input', validatePasswords);
+      confirmPasswordInput.addEventListener('input', validatePasswords);
+    }
+    
+    // Switch between tabs
+    function switchTab(tabId) {
+      tabButtons.forEach(button => {
+        if (button.getAttribute('data-tab') === tabId) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+      
+      tabContents.forEach(content => {
+        if (content.id === tabId + 'Tab') {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+    }
+    
+    // Save profile information
+    function saveProfile() {
+      userData.username = usernameInput.value;
+      userData.email = emailInput.value;
+      
+      // Save to localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Update UI
+      usernameElement.textContent = userData.username;
+      
+      showToast('Profile Updated', 'Your profile has been updated successfully.');
+    }
+    
+    // Change subscription plan
+    function changePlan(plan) {
+      userData.plan = plan;
+      
+      // Save to localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Update UI
+      userPlanElement.textContent = capitalizeFirstLetter(plan) + ' Plan';
+      updateActivePlan(plan);
+      
+      showToast('Plan Changed', `You are now on the ${plan} plan.`);
+    }
+    
+    // Update which plan is shown as active
+    function updateActivePlan(plan) {
+      planCards.forEach(card => card.classList.remove('active'));
+      
+      const planButtons = document.querySelectorAll('.plan-select-btn');
+      planButtons.forEach(btn => {
+        btn.textContent = 'Select Plan';
+        btn.disabled = false;
+      });
+      
+      // Highlight active plan
+      const activePlanCard = document.getElementById(`${plan}Plan`);
+      if (activePlanCard) {
+        activePlanCard.classList.add('active');
+        const activeButton = document.getElementById(`${plan}PlanBtn`);
+        if (activeButton) {
+          activeButton.textContent = 'Current Plan';
+          activeButton.disabled = true;
+        }
+      }
+    }
+    
+    // Validate password and confirm password match
+    function validatePasswords() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (password && confirmPassword && password === confirmPassword) {
+        updatePasswordBtn.disabled = false;
+      } else {
+        updatePasswordBtn.disabled = true;
+      }
+    }
+    
+    // Update password 
+    function updatePassword() {
+      // In a real app, this would send the password to a server
+      // For this example, we'll just show a toast
+      showToast('Password Changed', 'Your password has been updated successfully.');
+      
+      // Reset form
+      passwordInput.value = '';
+      confirmPasswordInput.value = '';
+      updatePasswordBtn.disabled = true;
+    }
+    
+    // Delete account
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        // In a real app, this would call an API to delete the account
+        showToast('Account Deleted', 'Your account has been deleted.', 'error');
+        
+        // Clear user data
+        localStorage.removeItem('userData');
+        
+        // Redirect to home or login page after a delay
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2000);
+      }
+    }
+    
+    // Sign out
+    function signOut() {
+      // In a real app, this would clear authentication tokens
+      console.log('Signing out...');
+      window.location.href = 'index.html';
+    }
+    
+    // Helper function to show toast notifications
+    function showToast(title, message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.classList.add('toast', type);
+      
+      toast.innerHTML = `
+        <div class="toast-header">
+          <strong>${title}</strong>
+          <button class="toast-close">&times;</button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      `;
+      
+      // Add toast container styles if not already added
+      if (!document.getElementById('toastStyles')) {
+        const style = document.createElement('style');
+        style.id = 'toastStyles';
+        style.textContent = `
+          .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+          }
+          
+          .toast {
+            width: 320px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 10px;
+            overflow: hidden;
+            animation: slide-in 0.3s ease-out;
+          }
+          
+          .toast.success {
+            border-left: 4px solid #10b981;
+          }
+          
+          .toast.error {
+            border-left: 4px solid #ef4444;
+          }
+          
+          .toast-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #f3f4f6;
+          }
+          
+          .toast-body {
+            padding: 12px 16px;
+          }
+          
+          .toast-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #9ca3af;
+          }
+          
+          @keyframes slide-in {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          
+          @keyframes fade-out {
+            from {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Create toast container if it doesn't exist
+      const toastContainer = document.getElementById('toastContainer');
+      toastContainer.classList.add('toast-container');
+      toastContainer.appendChild(toast);
+      
+      // Add close button functionality
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', () => {
+        removeToast(toast);
+      });
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        removeToast(toast);
+      }, 5000);
+    }
+    
+    // Remove a toast notification with animation
+    function removeToast(toast) {
+      toast.style.animation = 'fade-out 0.3s forwards';
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }
+    
+    // Helper function to capitalize first letter
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    // Initialize when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
