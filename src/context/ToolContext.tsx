@@ -7,10 +7,14 @@ interface ToolContextType {
   tools: AITool[];
   addTool: (tool: Omit<AITool, 'id' | 'createdAt' | 'status'>) => void;
   approveTool: (id: string) => void;
+  rejectTool: (id: string) => void;
   deleteTool: (id: string) => void;
   getToolById: (id: string) => AITool | undefined;
   getPendingTools: () => AITool[];
   getApprovedTools: () => AITool[];
+  getRejectedTools: () => AITool[];
+  getAllTools: () => AITool[];
+  getUserActivity: () => { userId: string; username: string; action: string; timestamp: Date }[];
 }
 
 const ToolContext = createContext<ToolContextType | undefined>(undefined);
@@ -62,6 +66,13 @@ const mockTools: AITool[] = [
   },
 ];
 
+// Mock user activity data
+const mockUserActivity = [
+  { userId: '1', username: 'John Doe', action: 'Added new tool: ChatGPT', timestamp: new Date('2024-05-15') },
+  { userId: '2', username: 'Jane Smith', action: 'Updated tool: Midjourney', timestamp: new Date('2024-05-14') },
+  { userId: '3', username: 'Bob Johnson', action: 'Deleted tool: Bard', timestamp: new Date('2024-05-13') },
+];
+
 export const ToolProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tools, setTools] = useState<AITool[]>([]);
 
@@ -92,6 +103,15 @@ export const ToolProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success('Tool approved successfully');
   };
 
+  const rejectTool = (id: string) => {
+    setTools(prevTools =>
+      prevTools.map(tool =>
+        tool.id === id ? { ...tool, status: 'rejected' } : tool
+      )
+    );
+    toast.success('Tool rejected successfully');
+  };
+
   const deleteTool = (id: string) => {
     setTools(prevTools => prevTools.filter(tool => tool.id !== id));
     toast.success('Tool deleted successfully');
@@ -109,15 +129,32 @@ export const ToolProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return tools.filter(tool => tool.status === 'approved');
   };
 
+  const getRejectedTools = () => {
+    return tools.filter(tool => tool.status === 'rejected');
+  };
+
+  const getAllTools = () => {
+    return tools;
+  };
+
+  const getUserActivity = () => {
+    // In a real app, this would fetch from a database
+    return mockUserActivity;
+  };
+
   return (
     <ToolContext.Provider value={{
       tools,
       addTool,
       approveTool,
+      rejectTool,
       deleteTool,
       getToolById,
       getPendingTools,
-      getApprovedTools
+      getApprovedTools,
+      getRejectedTools,
+      getAllTools,
+      getUserActivity
     }}>
       {children}
     </ToolContext.Provider>
