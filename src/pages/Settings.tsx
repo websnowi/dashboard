@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { 
@@ -18,7 +17,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useUserContext } from '@/context/UserContext';
-import { ToolProvider } from '@/context/ToolContext';
 import { useToast } from '@/hooks/use-toast';
 
 const Settings: React.FC = () => {
