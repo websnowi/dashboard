@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support | AI Tools Navigator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Mobile sidebar toggle -->
+    <div class="fixed top-4 left-4 z-50 md:hidden">
+      <button id="sidebarToggle" class="h-10 w-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center">
+        <i data-lucide="menu" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed md:sticky top-0 left-0 z-40 h-screen w-64 transform transition-transform duration-300 ease-in-out sidebar text-white flex flex-col -translate-x-full md:translate-x-0">
+      <!-- Logo area -->
+      <div class="px-6 py-8">
+        <h1 id="userName" class="text-2xl font-bold text-white">User Dashboard</h1>
+        <p id="userPlan" class="text-sm text-white/70 mt-1">Starter Plan</p>
+      </div>
+
+      <!-- Navigation links -->
+      <div class="flex-1 px-4 py-6">
+        <nav class="space-y-2">
+          <a href="home.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="home" class="mr-4 h-5 w-5"></i>
+            Home
+          </a>
+          <a href="analytics.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="bar-chart-2" class="mr-4 h-5 w-5"></i>
+            Analytics
+          </a>
+          <a href="ads.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="megaphone" class="mr-4 h-5 w-5"></i>
+            Ads
+          </a>
+          <a href="support.html" class="w-full flex items-center px-4 py-6 text-lg bg-slate-700 text-white rounded-md">
+            <i data-lucide="help-circle" class="mr-4 h-5 w-5"></i>
+            Support
+          </a>
+        </nav>
+      </div>
+
+      <!-- Settings and Sign out buttons -->
+      <div class="px-4 py-6 border-t border-slate-600">
+        <a href="settings.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors mb-2">
+          <i data-lucide="settings" class="mr-4 h-5 w-5"></i>
+          Settings
+        </a>
+        <button id="signOutBtn" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+          <i data-lucide="log-out" class="mr-4 h-5 w-5"></i>
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6 md:p-10">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Support</h1>
+          <p class="text-gray-600">
+            Need help? We're here for you.
+          </p>
+        </div>
+        
+        <!-- Support Tabs -->
+        <div class="bg-white rounded-lg shadow border border-gray-200">
+          <div class="border-b border-gray-200">
+            <nav class="flex space-x-8 px-6" aria-label="Tabs">
+              <button id="contactTab" class="border-b-2 border-purple-500 py-4 px-1 text-sm font-medium text-purple-600">
+                Contact Us
+              </button>
+              <button id="faqTab" class="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                FAQ
+              </button>
+            </nav>
+          </div>
+          
+          <div class="p-6">
+            <!-- Contact Form -->
+            <div id="contactContent">
+              <div class="mb-6">
+                <h2 class="text-xl font-bold">Get in Touch</h2>
+                <p class="text-sm text-gray-600 mt-1">
+                  Fill out the form below and we'll get back to you as soon as possible.
+                </p>
+              </div>
+              
+              <form id="contactForm" class="space-y-4">
+                <div class="space-y-2">
+                  <label for="name" class="text-sm font-medium">Name</label>
+                  <input id="name" type="text" placeholder="Your name" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                </div>
+                
+                <div class="space-y-2">
+                  <label for="email" class="text-sm font-medium">Email</label>
+                  <input id="email" type="email" placeholder="Your email address" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                </div>
+                
+                <div class="space-y-2">
+                  <label for="subject" class="text-sm font-medium">Subject</label>
+                  <input id="subject" type="text" placeholder="What's this about?" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                </div>
+                
+                <div class="space-y-2">
+                  <label for="message" class="text-sm font-medium">Message</label>
+                  <textarea id="message" rows="5" placeholder="How can we help you?" class="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-purple-600 text-white py-2 px-4 rounded-md font-medium hover:bg-purple-700 transition-colors">
+                  Send Message
+                </button>
+              </form>
+            </div>
+            
+            <!-- FAQ Content -->
+            <div id="faqContent" class="hidden">
+              <div class="mb-6">
+                <h2 class="text-xl font-bold">Frequently Asked Questions</h2>
+                <p class="text-sm text-gray-600 mt-1">
+                  Find quick answers to common questions
+                </p>
+              </div>
+              
+              <div class="space-y-6">
+                <div class="space-y-2">
+                  <h3 class="font-bold">How do I add a new AI tool?</h3>
+                  <p class="text-gray-600">
+                    Navigate to the Home section and fill out the tool submission form with all required details, then click Submit.
+                  </p>
+                </div>
+                
+                <div class="space-y-2">
+                  <h3 class="font-bold">How long does the review process take?</h3>
+                  <p class="text-gray-600">
+                    We typically review new tool submissions within 24-48 hours.
+                  </p>
+                </div>
+                
+                <div class="space-y-2">
+                  <h3 class="font-bold">How do analytics work?</h3>
+                  <p class="text-gray-600">
+                    The analytics section shows user engagement with your tools. The data available depends on your subscription plan.
+                  </p>
+                </div>
+                
+                <div class="space-y-2">
+                  <h3 class="font-bold">How do I upgrade my plan?</h3>
+                  <p class="text-gray-600">
+                    Go to Settings > Plan and select the plan you wish to upgrade to.
+                  </p>
+                </div>
+                
+                <div class="space-y-2">
+                  <h3 class="font-bold">How do ad placements work?</h3>
+                  <p class="text-gray-600">
+                    In the Ads section, you can bid on different ad placement positions. The highest bid gets the position.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+      </div>
+      <div class="ml-3">
+        <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // State management
+    let userData = JSON.parse(localStorage.getItem('userData') || '{"name": "User Dashboard", "plan": "starter"}');
+    let currentTab = 'contact';
+
+    // DOM Elements
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const contactTab = document.getElementById('contactTab');
+    const faqTab = document.getElementById('faqTab');
+    const contactContent = document.getElementById('contactContent');
+    const faqContent = document.getElementById('faqContent');
+    const contactForm = document.getElementById('contactForm');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    // Sidebar toggle
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Load user data
+    document.getElementById('userName').textContent = userData.name;
+    document.getElementById('userPlan').textContent = userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1) + ' Plan';
+
+    // Tab switching
+    contactTab.addEventListener('click', () => {
+      currentTab = 'contact';
+      updateTabs();
+    });
+
+    faqTab.addEventListener('click', () => {
+      currentTab = 'faq';
+      updateTabs();
+    });
+
+    function updateTabs() {
+      if (currentTab === 'contact') {
+        contactTab.classList.add('border-purple-500', 'text-purple-600');
+        contactTab.classList.remove('border-transparent', 'text-gray-500');
+        faqTab.classList.add('border-transparent', 'text-gray-500');
+        faqTab.classList.remove('border-purple-500', 'text-purple-600');
+        contactContent.classList.remove('hidden');
+        faqContent.classList.add('hidden');
+      } else {
+        faqTab.classList.add('border-purple-500', 'text-purple-600');
+        faqTab.classList.remove('border-transparent', 'text-gray-500');
+        contactTab.classList.add('border-transparent', 'text-gray-500');
+        contactTab.classList.remove('border-purple-500', 'text-purple-600');
+        faqContent.classList.remove('hidden');
+        contactContent.classList.add('hidden');
+      }
+    }
+
+    // Contact form submission
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      showToast("Support Request Sent - We'll get back to you as soon as possible.");
+      
+      // Reset form
+      contactForm.reset();
+    });
+
+    // Show toast
+    function showToast(message) {
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Sign out
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to sign out?')) {
+        localStorage.removeItem('userData');
+        window.location.href = 'user-panel.html';
+      }
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+        sidebar.classList.add('-translate-x-full');
+      }
+    });
+  </script>
+</body>
+</html>

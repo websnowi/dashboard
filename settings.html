@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | AI Tools Navigator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 16px 20px;
+      max-width: 400px;
+      z-index: 1000;
+      border-left: 4px solid #10b981;
+      animation: slideIn 0.3s ease-out;
+    }
+    .toast.error {
+      border-left-color: #ef4444;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .plan-card.active {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 1px #6366f1;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Mobile sidebar toggle -->
+    <div class="fixed top-4 left-4 z-50 md:hidden">
+      <button id="sidebarToggle" class="h-10 w-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center">
+        <i data-lucide="menu" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed md:sticky top-0 left-0 z-40 h-screen w-64 transform transition-transform duration-300 ease-in-out sidebar text-white flex flex-col -translate-x-full md:translate-x-0">
+      <!-- Logo area -->
+      <div class="px-6 py-8">
+        <h1 id="userName" class="text-2xl font-bold text-white">User Dashboard</h1>
+        <p id="userPlan" class="text-sm text-white/70 mt-1">Starter Plan</p>
+      </div>
+
+      <!-- Navigation links -->
+      <div class="flex-1 px-4 py-6">
+        <nav class="space-y-2">
+          <a href="home.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="home" class="mr-4 h-5 w-5"></i>
+            Home
+          </a>
+          <a href="analytics.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="bar-chart-2" class="mr-4 h-5 w-5"></i>
+            Analytics
+          </a>
+          <a href="ads.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="megaphone" class="mr-4 h-5 w-5"></i>
+            Ads
+          </a>
+          <a href="support.html" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+            <i data-lucide="help-circle" class="mr-4 h-5 w-5"></i>
+            Support
+          </a>
+        </nav>
+      </div>
+
+      <!-- Settings and Sign out buttons -->
+      <div class="px-4 py-6 border-t border-slate-600">
+        <a href="settings.html" class="w-full flex items-center px-4 py-6 text-lg bg-slate-700 text-white rounded-md mb-2">
+          <i data-lucide="settings" class="mr-4 h-5 w-5"></i>
+          Settings
+        </a>
+        <button id="signOutBtn" class="w-full flex items-center px-4 py-6 text-lg hover:bg-slate-700 text-white/80 hover:text-white rounded-md transition-colors">
+          <i data-lucide="log-out" class="mr-4 h-5 w-5"></i>
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="flex-1 p-6 md:p-10">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Settings</h1>
+          <p class="text-gray-600">
+            Manage your account settings and preferences
+          </p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="space-y-8">
+          <!-- Tab Navigation -->
+          <div class="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 w-full max-w-md">
+            <button id="profileTab" class="tab-trigger inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all bg-white text-gray-900 shadow-sm" data-tab="profile">
+              Profile
+            </button>
+            <button id="planTab" class="tab-trigger inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all" data-tab="plan">
+              Plan
+            </button>
+            <button id="accountTab" class="tab-trigger inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all" data-tab="account">
+              Account
+            </button>
+          </div>
+          
+          <!-- Profile Tab Content -->
+          <div id="profileContent" class="tab-content active">
+            <div class="bg-white rounded-lg shadow border border-gray-200">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold">Profile Settings</h2>
+                <p class="text-gray-600 text-sm mt-1">Update your personal information</p>
+              </div>
+              <div class="p-6 space-y-4">
+                <div>
+                  <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                  <input type="text" id="username" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" id="email" value="user@example.com" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+              </div>
+              <div class="px-6 py-4 border-t border-gray-200">
+                <button id="saveProfile" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Plan Tab Content -->
+          <div id="planContent" class="tab-content">
+            <div class="grid gap-6 md:grid-cols-3">
+              <!-- Starter Plan -->
+              <div id="starterPlan" class="plan-card bg-white rounded-lg shadow border border-gray-200 transition-all">
+                <div class="px-6 py-4 border-b border-gray-200">
+                  <h2 class="text-xl font-semibold">Starter</h2>
+                  <p class="text-2xl font-bold mt-1">$29/month</p>
+                </div>
+                <div class="p-6">
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                      <span>Monthly analytics</span>
+                    </li>
+                    <li class="flex items-center">
+                      <span>Basic features</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200">
+                  <button id="selectStarter" class="plan-btn w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700" data-plan="starter">
+                    Select Plan
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Professional Plan -->
+              <div id="professionalPlan" class="plan-card bg-white rounded-lg shadow border border-gray-200 transition-all">
+                <div class="px-6 py-4 border-b border-gray-200">
+                  <h2 class="text-xl font-semibold">Professional</h2>
+                  <p class="text-2xl font-bold mt-1">$59/month</p>
+                </div>
+                <div class="p-6">
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                      <span>Monthly & weekly analytics</span>
+                    </li>
+                    <li class="flex items-center">
+                      <span>Advanced features</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200">
+                  <button id="selectProfessional" class="plan-btn w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700" data-plan="professional">
+                    Select Plan
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Enterprise Plan -->
+              <div id="enterprisePlan" class="plan-card bg-white rounded-lg shadow border border-gray-200 transition-all">
+                <div class="px-6 py-4 border-b border-gray-200">
+                  <h2 class="text-xl font-semibold">Enterprise</h2>
+                  <p class="text-2xl font-bold mt-1">$99/month</p>
+                </div>
+                <div class="p-6">
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-center">
+                      <span>Daily, weekly & monthly analytics</span>
+                    </li>
+                    <li class="flex items-center">
+                      <span>Premium support</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200">
+                  <button id="selectEnterprise" class="plan-btn w-full inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700" data-plan="enterprise">
+                    Select Plan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Account Tab Content -->
+          <div id="accountContent" class="tab-content">
+            <div class="bg-white rounded-lg shadow border border-gray-200">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold">Account Security</h2>
+                <p class="text-gray-600 text-sm mt-1">Update your password or delete your account</p>
+              </div>
+              <div class="p-6 space-y-4">
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <input type="password" id="password" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                  <input type="password" id="confirmPassword" class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+              </div>
+              <div class="px-6 py-4 border-t border-gray-200 flex justify-between">
+                <button id="updatePassword" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                  Update Password
+                </button>
+                <button id="deleteAccount" class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-red-600 text-white hover:bg-red-700">
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // State management
+    let userData = JSON.parse(localStorage.getItem('userData') || '{"name": "User Dashboard", "plan": "starter"}');
+
+    // DOM Elements
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const userName = document.getElementById('userName');
+    const userPlan = document.getElementById('userPlan');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    // Tab elements
+    const tabTriggers = document.querySelectorAll('.tab-trigger');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Button elements
+    const saveProfileBtn = document.getElementById('saveProfile');
+    const updatePasswordBtn = document.getElementById('updatePassword');
+    const deleteAccountBtn = document.getElementById('deleteAccount');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const planBtns = document.querySelectorAll('.plan-btn');
+
+    // Sidebar toggle
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Load user data
+    function loadUserData() {
+      userName.textContent = userData.name;
+      userPlan.textContent = userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1) + ' Plan';
+      usernameInput.value = userData.name;
+      updateActivePlan(userData.plan);
+    }
+
+    // Tab switching
+    tabTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const tabName = trigger.getAttribute('data-tab');
+        
+        // Update tab triggers
+        tabTriggers.forEach(t => {
+          t.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+        });
+        trigger.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+        
+        // Update tab content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(tabName + 'Content').classList.add('active');
+      });
+    });
+
+    // Update active plan
+    function updateActivePlan(plan) {
+      // Reset all plan cards
+      document.querySelectorAll('.plan-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      
+      // Reset all plan buttons
+      planBtns.forEach(btn => {
+        btn.textContent = 'Select Plan';
+        btn.disabled = false;
+        btn.classList.remove('bg-gray-600');
+        btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+      });
+      
+      // Highlight active plan
+      const activePlan = document.getElementById(plan + 'Plan');
+      const activeBtn = document.getElementById('select' + plan.charAt(0).toUpperCase() + plan.slice(1));
+      
+      if (activePlan && activeBtn) {
+        activePlan.classList.add('active');
+        activeBtn.textContent = 'Current Plan';
+        activeBtn.disabled = true;
+        activeBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+        activeBtn.classList.add('bg-gray-600');
+      }
+    }
+
+    // Plan selection
+    planBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plan = btn.getAttribute('data-plan');
+        userData.plan = plan;
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
+        userPlan.textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
+        updateActivePlan(plan);
+        
+        showToast('Plan Changed', `You are now on the ${plan} plan.`);
+      });
+    });
+
+    // Password validation
+    function validatePasswords() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (password && confirmPassword && password === confirmPassword) {
+        updatePasswordBtn.disabled = false;
+      } else {
+        updatePasswordBtn.disabled = true;
+      }
+    }
+
+    passwordInput.addEventListener('input', validatePasswords);
+    confirmPasswordInput.addEventListener('input', validatePasswords);
+
+    // Save profile
+    saveProfileBtn.addEventListener('click', () => {
+      userData.name = usernameInput.value;
+      localStorage.setItem('userData', JSON.stringify(userData));
+      userName.textContent = userData.name;
+      
+      showToast('Profile Updated', 'Your profile has been updated successfully.');
+    });
+
+    // Update password
+    updatePasswordBtn.addEventListener('click', () => {
+      showToast('Password Changed', 'Your password has been updated successfully.');
+      passwordInput.value = '';
+      confirmPasswordInput.value = '';
+      updatePasswordBtn.disabled = true;
+    });
+
+    // Delete account
+    deleteAccountBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        showToast('Account Deleted', 'Your account has been deleted.', 'error');
+        // In a real app, this would redirect to login
+      }
+    });
+
+    // Sign out
+    signOutBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to sign out?')) {
+        localStorage.removeItem('userData');
+        window.location.href = 'user-panel.html';
+      }
+    });
+
+    // Toast notification system
+    function showToast(title, message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-semibold">${title}</div>
+            <div class="text-sm text-gray-600 mt-1">${message}</div>
+          </div>
+          <button class="ml-4 text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.remove()">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+      `;
+      
+      document.body.appendChild(toast);
+      lucide.createIcons();
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.style.animation = 'slideOut 0.3s ease-in forwards';
+          setTimeout(() => toast.remove(), 300);
+        }
+      }, 5000);
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+        sidebar.classList.add('-translate-x-full');
+      }
+    });
+
+    // Initialize page
+    loadUserData();
+  </script>
+</body>
+</html>
