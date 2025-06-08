@@ -1245,7 +1245,7 @@
   };
 
   try {
-    const response = await fetch('/add-tool', {
+    const response = await fetch('/api/add-tool', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTool)
