@@ -1229,30 +1229,45 @@
       });
 
       // Form submission
-      addToolForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const newTool = {
-          id: Date.now().toString(),
-          name: formData.get('name'),
-          description: formData.get('description'),
-          link: formData.get('link'),
-          imageUrl: previewImg.src || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&auto=format&fit=crop&q=60',
-          status: 'pending',
-          createdAt: new Date().toISOString()
-        };
-        
-        tools.push(newTool);
-        localStorage.setItem('tools', JSON.stringify(tools));
-        
-        // Reset form
-        e.target.reset();
-        imagePreview.classList.add('hidden');
-        
-        showToast('Tool submitted successfully! It will be reviewed shortly.');
-        renderTools();
-      });
+      ///////////////////////
+      addToolForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const newTool = {
+    id: Date.now().toString(),
+    name: formData.get('name'),
+    description: formData.get('description'),
+    link: formData.get('link'),
+    imageUrl: previewImg.src || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&auto=format&fit=crop&q=60',
+    status: 'pending',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch('/api/add-tool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTool)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      showToast('Tool submitted successfully! It will be reviewed shortly.');
+      e.target.reset();
+      imagePreview.classList.add('hidden');
+      // Optionally update UI if you want to add the new tool instantly
+      // tools.push(newTool);
+      // renderTools();
+    } else {
+      showToast('Failed to submit tool: ' + result.message);
+    }
+  } catch (error) {
+    showToast('Failed to submit tool: Network error');
+  }
+});
+///////////////////////
 
       // Tab switching
       pendingTab.addEventListener('click', () => {
