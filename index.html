@@ -1142,7 +1142,7 @@
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         // Demo credentials for testing
-        if (email === 'websnowi@gmail.com' && password === 'webby!123') {
+        if (email === 'websnowi@gmail.com' && password === 'webby123') {
           // Store user data
           userData = {
             name: 'Webby',
@@ -1245,7 +1245,7 @@
   };
 
   try {
-    const response = await fetch('/api/add-tool', {
+    const response = await fetch('/add-tool', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTool)
