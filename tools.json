@@ -1,23 +1,7 @@
-[
-  {
-    "id": "tool1",
-    "name": "AI Content Generator",
-    "imageUrl": "https://via.placeholder.com/32x32/6366f1/ffffff?text=AI",
-    "status": "approved",
-    "description": "Generate high-quality content with AI"
-  },
-  {
-    "id": "tool2",
-    "name": "Smart Analytics",
-    "imageUrl": "https://via.placeholder.com/32x32/8b5cf6/ffffff?text=SA",
-    "status": "approved",
-    "description": "Advanced analytics for your business"
-  },
-  {
-    "id": "tool3",
-    "name": "Code Assistant",
-    "imageUrl": "https://via.placeholder.com/32x32/06b6d4/ffffff?text=CA",
-    "status": "approved",
-    "description": "AI-powered coding assistance"
-  }
-]
+{
+  "name": "Test Tool",
+  "description": "Testing",
+  "link": "https://example.com",
+  "imageUrl": "https://via.placeholder.com/150",
+  "status": "pending"
+}
